@@ -5,7 +5,7 @@ Victoria Lariot - 6124058
 Martin Alvarez - 5856597
 Gretel Gomez Rodriguez - 6174028
 Github link:
-https://github.com/xxx/yyy
+https://github.com/maagjoel/Networking-Project-3/tree/main
 
 *******************/
 
@@ -144,17 +144,9 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 		// Print the topology if not yet.
 		if (!printedTopo) {
 			System.out.println("*** Print topology");
-//			System.out.println(floodlightProvider.getAllSwitchMap()); //this gives us switch #s and ipv4 addresses and port #s
-//			System.out.println(floodlightProvider.getAllSwitchDpids()); // this gives us the switch #s
-//			System.out.println(floodlightProvider.getSwitch(1)); // prints info for given switch
-//			System.out.println(linkProvider.getSwitchLinks());
-//			System.out.println(lds.getSwitchLinks());
-			
-			//System.out.println(linkProvider.);
+
 			Map<Long, Set<Link>> links = linkProvider.getSwitchLinks();
-			/*for (Long link : links.keySet()) {
-	            System.out.println(link);
-	        }*/
+			
 			ArrayList<Long> rlinks = new ArrayList<Long>();
 			
 			for (Map.Entry<Long, Set<Link>> me : links.entrySet()) { 
@@ -180,31 +172,9 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 	            }
 	            System.out.println();
 	            rlinks.clear();
-	            //System.out.println(me.getValue()); 
+	           
 	            
-	        } // make sure to uncomment this
-			//for(Long l : links)
-			//System.out.println(linkProvider.get)
-			
-			/*for (Link key : links.keySet()) {
-	            System.out.println(key);
-	        }*/
-			//System.out.println(links.keySet().toString());
-			
-			/*Iterator iterator = switches.entrySet().iterator();
-			while (iterator.hasNext()) 
-			{
-			    Map.Entry mapEntry = (Map.Entry) iterator.next();
-			System.out.println("The key is: " + mapEntry.getKey() + ",value is :" + mapEntry.getValue());
-
-			} */
-			//System.out.println(sw.getStringId());
-			
-			
-
-			// For each switch, print its neighbor switches.
-			//for ( : switches)
-
+	        } 
 			printedTopo = true;
 		}
 
@@ -226,14 +196,7 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 		    match.loadFromPacket(pi.getPacketData(), pi.getInPort());
 		    String sourceIP= match.getNetworkSourceCIDR().substring(0, match.getNetworkSourceCIDR().indexOf("/"));
 		    String destinationIP = match.getNetworkDestinationCIDR().substring(0, match.getNetworkDestinationCIDR().indexOf("/"));
-		    
-		   
-		    
-		    
-		 
-		    //System.out.println(match.getInputPort());
-
-		    
+	
 			
 			// Obtain source and destination IPs.
 			// ...
