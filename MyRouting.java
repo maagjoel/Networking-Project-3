@@ -12,7 +12,9 @@ https://github.com/xxx/yyy
 package net.floodlightcontroller.myrouting;
 
 import java.util.Collection;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +77,7 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 	protected ILinkDiscoveryService lds;
 	protected IStaticFlowEntryPusherService flowPusher;
 	protected boolean printedTopo = false;
+	protected ArrayList<ArrayList> neighbors = new ArrayList<ArrayList>();
 	//protected ILinkDiscoveryService linkDiscoveryProvider; //possibly delete this
 	
 
@@ -140,7 +143,7 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 
 		
-
+		
 		// Print the topology if not yet.
 		if (!printedTopo) {
 			System.out.println("*** Print topology");
@@ -155,6 +158,7 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 			/*for (Long link : links.keySet()) {
 	            System.out.println(link);
 	        }*/
+			
 			ArrayList<Long> rlinks = new ArrayList<Long>();
 			
 			for (Map.Entry<Long, Set<Link>> me : links.entrySet()) { 
@@ -170,19 +174,30 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 	               }
 	               
 	            }
+	            
+	            
+	            
 	            System.out.print("Switch " + me.getKey() +" neighbors: "/*+ rlinks*/);
 	            for(int i = 0; i < rlinks.size(); i ++) {
-	            	if(i == rlinks.size()-1)
+	            	if(i == rlinks.size()-1) {
 	            		System.out.print(rlinks.get(i));
+	            		
+	            	}
 	            	
-	            	else
+	            	else {
 	            		System.out.print(rlinks.get(i)+ ", ");
+	            	}
 	            }
+	            
 	            System.out.println();
+	            neighbors.add((ArrayList)rlinks.clone());
+	            
 	            rlinks.clear();
 	            //System.out.println(me.getValue()); 
 	            
-	        } // make sure to uncomment this
+	        }
+			
+			// make sure to uncomment this
 			//for(Long l : links)
 			//System.out.println(linkProvider.get)
 			
@@ -240,11 +255,24 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 			System.out.println("srcIP: " + sourceIP);
 	        System.out.println("dstIP: " + destinationIP);
 
-
+	        System.out.println(neighbors);
 			// Calculate the path using Dijkstra's algorithm.
 			Route route = null;
+			ArrayList<Long>SPT = new <Long>ArrayList();
+			ArrayList<Long>Current = new <Long>ArrayList();
+			ArrayList<Long>StartList = new <Long>ArrayList();
+			//System.out.println(neighbors.get(1));
+			int points = 0;
+			int start = Integer.parseInt(sourceIP.substring(sourceIP.lastIndexOf(".")+1));
+			int end =Integer.parseInt(destinationIP.substring(destinationIP.lastIndexOf(".")+1));
+			StartList = neighbors.get(start-1);
+			System.out.println(StartList);
+			Set<Long> vertices = floodlightProvider.getAllSwitchDpids();
+			
+			
 			// ...
-			System.out.println("route: " + "1 2 3 ...");			
+			System.out.println("route: " + "1 2 3 ...");
+			dijkstras(start, end, vertices);
 
 			// Write the path into the flow tables of the switches on the path.
 			if (route != null) {
@@ -254,7 +282,38 @@ public class MyRouting implements IOFMessageListener, IFloodlightModule {
 			return Command.STOP;
 		}
 	}
-
+	public long dijkstras(int current, int destination, Set<Long> vertices) {
+		Set<Long> settled = new HashSet<>();
+		
+		ArrayList<Integer>distance = new <Integer>ArrayList();
+		for( int i = 0; i < vertices.size(); i++) {
+			distance.add(Integer.MAX_VALUE);
+		}
+		
+		//int points = 0;
+		
+		ArrayList<Long>StartList = new <Long>ArrayList();
+		//settled.add((long)current);
+		StartList = neighbors.get(current);
+		for (long l : StartList) {
+			distance.set((int)l-1,costCalculator(current, l));
+				
+		}
+		System.out.println(distance);
+		
+		
+		
+		return 3;
+	}
+	public int costCalculator(long start, long end) {
+		if ( start% 2 != 0 && end %2 != 0) 
+			return 1;
+		else if ( start %2 == 0 && end % 2 == 0)
+			return 100;
+		else 
+			return 10;
+	}
+	
 	// Install routing rules on switches. 
 	private void installRoute(List<NodePortTuple> path, OFMatch match) {
 
